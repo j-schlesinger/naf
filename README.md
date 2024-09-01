@@ -11,7 +11,7 @@ See [NAF homepage](http://kirill-kryukov.com/study/naf/) for details.
 | Example benchmark: SILVA 132 LSURef database (610 MB): |
 |---------------------------------------------|
 | <img src="http://kirill-kryukov.com/study/naf/images/SILVA-132-LSURef-ratio-vs-cd-speed-lin-log.svg" width="49%"> <img src="http://kirill-kryukov.com/study/naf/images/SILVA-132-LSURef-ratio-vs-d-speed-lin-log.svg" width="49%"> |
-| From [Sequence Compression Benchmark](http://kirr.dyndns.org/sequence-compression-benchmark/) project - visit for details and more benchmarks. |
+| From [Sequence Compression Benchmark](https://biokirr.com/Sequence-Compression-Benchmark/) project - visit for details and more benchmarks. |
 
 More examples:
 *   [Compactness on DNA data](http://kirr.dyndns.org/sequence-compression-benchmark/?d=Mitochondrion+%28245+MB%29&amp;d=Influenza+%281.22+GB%29&amp;d=Helicobacter+%282.76+GB%29&amp;doagg=1&amp;agg=average&amp;cs=1&amp;cg=1&amp;com=yes&amp;src=all&amp;nt=4&amp;only-best=1&amp;bn=1&amp;bm=ratio&amp;sm=same&amp;tn=10&amp;bs=100&amp;rr=gzip-9&amp;tm0=name&amp;tm1=size&amp;tm2=ratio&amp;tm3=ctime&amp;tm4=dtime&amp;tm5=cdtime&amp;tm6=tdtime&amp;tm7=empty&amp;gm=same&amp;cyl=lin&amp;ccw=1500&amp;cch=500&amp;sxm=ratio&amp;sxmin=0&amp;sxmax=0&amp;sxl=lin&amp;sym=dspeed&amp;symin=0&amp;symax=0&amp;syl=lin&amp;button=Show+column+chart)
@@ -108,6 +108,6 @@ doi: [10.1093/bioinformatics/btz144](https://doi.org/10.1093/bioinformatics/btz1
 For compressor benchmark, please cite:
 
  * Kirill Kryukov, Mahoko Takahashi Ueda, So Nakagawa, Tadashi Imanishi (2020)
-**"Sequence Compression Benchmark (SCB) database — A comprehensive evaluation of reference-free compressors for FASTA-formatted sequences"**
+**"Sequence Compression Benchmark (SCB) database â€” A comprehensive evaluation of reference-free compressors for FASTA-formatted sequences"**
 [GigaScience, 9(7), giaa072](https://academic.oup.com/gigascience/article/9/7/giaa072/5867695),
 doi: [10.1093/gigascience/giaa072](https://doi.org/10.1093/gigascience/giaa072).
