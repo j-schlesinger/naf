@@ -2,6 +2,7 @@
 
 ## Unreleased
 - Added `--quantize` option to _ennaf_, to enable lossy quantization of FASTQ qualities.
+- Stopped replacing unknown characters in sequence names.
 - Improved Makefile portability.
 - Improved compatibility with clang.
 - Updated zstd to v1.5.7.

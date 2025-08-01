@@ -96,32 +96,8 @@ static void report_unexpected_char_stats(unsigned long long *n, const char *seq_
 
 static void report_unexpected_input_char_stats(void)
 {
-    report_unexpected_char_stats(n_unexpected_id_characters, "id");
-    report_unexpected_char_stats(n_unexpected_comment_characters, "comment");
     report_unexpected_char_stats(n_unexpected_seq_characters, in_seq_type_name);
     report_unexpected_char_stats(n_unexpected_qual_characters, "quality");
-}
-
-
-__attribute__ ((cold))
-static void unexpected_id_char(unsigned c)
-{
-    if (abort_on_unexpected_code)
-    {
-        die("unexpected character '%c' in ID of sequence %llu\n", (unsigned char)c, n_sequences + 1);
-    }
-    else { n_unexpected_id_characters[c]++; }
-}
-
-
-__attribute__ ((cold))
-static void unexpected_comment_char(unsigned c)
-{
-    if (abort_on_unexpected_code)
-    {
-        die("unexpected character '%c' in comment of sequence %llu\n", (unsigned char)c, n_sequences + 1);
-    }
-    else { n_unexpected_comment_characters[c]++; }
 }
 
 
@@ -322,7 +298,7 @@ static void process_well_formed_fasta(void)
 {
     unsigned c;
     do {
-        c = in_get_until(is_well_formed_space_arr, &name);
+        c = in_get_until(is_space_or_lf_arr, &name);
         str_append_char(&name, '\0');
 
         if (c == ' ') { c = in_get_until_specific_char('\n', &comment); }
@@ -367,21 +343,10 @@ static void process_non_well_formed_fasta(void)
     unsigned c;
     do {
         // At this point the '>' was already read, so we immediately proceed to read the name.
-        while ( (c = in_get_until(is_unexpected_text_arr, &name)) != INEOF )
-        {
-            if (is_space_arr[c]) { break; }
-            else { unexpected_id_char(c); str_append_char(&seq, unexpected_name_char_replacement); }
-        }
+        c = in_get_until(is_space_or_eol_arr, &name);
         str_append_char(&name, '\0');
 
-        if (c != INEOF && !is_eol_arr[c])
-        {
-            while ( (c = in_get_until(is_unexpected_comment_arr, &comment)) != INEOF )
-            {
-                if (is_eol_arr[c]) { break; }
-                else { unexpected_comment_char(c); str_append_char(&comment, unexpected_name_char_replacement); }
-            }
-        }
+        if (c == ' ') { c = in_get_until(is_eol_arr, &comment); }
         str_append_char(&comment, '\0');
 
         unsigned long long old_total_seq_size = seq_size_original + seq.length;
@@ -407,13 +372,13 @@ static void process_non_well_formed_fasta(void)
                             while (c != INEOF && is_eol_arr[c]) { c = in_get_char(); }
                             if (c == '>' || c == INEOF) { break; }
                             else if (!is_unexpected_arr[c]) { str_append_char(&seq, (unsigned char)c); continue; }
-                            else if (is_space_arr[c]) {}
+                            else if (is_space_tab_or_eol_arr[c]) {}
                             else { unexpected_input_char(c); str_append_char(&seq, unexpected_seq_char_replacement); }
                         }
-                        else if (is_space_arr[c]) {}
+                        else if (is_space_tab_or_eol_arr[c]) {}
                         else { unexpected_input_char(c); str_append_char(&seq, unexpected_seq_char_replacement); }
                     }
-                    else if (is_space_arr[c]) {}
+                    else if (is_space_tab_or_eol_arr[c]) {}
                     else if (c == '>' && in_seq_type == seq_type_text) { str_append_char(&seq, (unsigned char)c); }
                     else { unexpected_input_char(c); str_append_char(&seq, unexpected_seq_char_replacement); }
                 }
@@ -439,7 +404,7 @@ static void process_well_formed_fastq(void)
     unsigned c;
     for (;;)
     {
-        c = in_get_until(is_well_formed_space_arr, &name);
+        c = in_get_until(is_space_or_lf_arr, &name);
         str_append_char(&name, '\0');
 
         if (c == ' ') { c = in_get_until_specific_char('\n', &comment); }
@@ -486,21 +451,10 @@ static void process_non_well_formed_fastq(void)
     unsigned c;
     for (;;)
     {
-        while ( (c = in_get_until(is_unexpected_text_arr, &name)) != INEOF )
-        {
-            if (is_space_arr[c]) { break; }
-            else { unexpected_id_char(c); str_append_char(&seq, unexpected_name_char_replacement); }
-        }
+        c = in_get_until(is_space_or_eol_arr, &name);
         str_append_char(&name, '\0');
 
-        if (c != INEOF && !is_eol_arr[c])
-        {
-            while ( (c = in_get_until(is_unexpected_comment_arr, &comment)) != INEOF )
-            {
-                if (is_eol_arr[c]) { break; }
-                else { unexpected_comment_char(c); str_append_char(&comment, unexpected_name_char_replacement); }
-            }
-        }
+        if (c == ' ') { c = in_get_until(is_eol_arr, &comment); }
         str_append_char(&comment, '\0');
 
         if (c == INEOF) { die("truncated FASTQ input: last sequence has no sequence data\n"); }
@@ -508,7 +462,7 @@ static void process_non_well_formed_fastq(void)
         while ( (c = in_get_until(is_unexpected_arr, &seq)) != INEOF)
         {
             if (is_eol_arr[c]) { break; }
-            else if (is_space_arr[c]) {}
+            else if (is_space_tab_or_eol_arr[c]) {}
             else { unexpected_input_char(c); str_append_char(&seq, unexpected_seq_char_replacement); }
         }
         unsigned long long read_length = seq_size_original + seq.length - old_len;
@@ -531,7 +485,7 @@ static void process_non_well_formed_fastq(void)
         while ( (c = in_get_until(is_unexpected_qual_arr, &qual)) != INEOF)
         {
             if (is_eol_arr[c]) { break; }
-            else if (is_space_arr[c]) {}
+            else if (is_space_tab_or_eol_arr[c]) {}
             else { unexpected_quality_char(c); str_append_char(&qual, unexpected_qual_char_replacement); }
         }
         unsigned long long qual_length = QUAL.uncompressed_size + qual.length - old_len;
@@ -558,7 +512,7 @@ static void confirm_input_format(void)
     unsigned last_c = '\n';
     unsigned c;
 
-    while ((c = in_get_char()) != INEOF && is_space_arr[c]) { last_c = c; }
+    while ((c = in_get_char()) != INEOF && is_space_tab_or_eol_arr[c]) { last_c = c; }
     if (c == INEOF) { return; }
 
     if (c == '>' && is_eol_arr[last_c]) { in_format_from_input = in_format_fasta; }
