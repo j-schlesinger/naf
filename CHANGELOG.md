@@ -4,7 +4,7 @@
 - Added `--quantize` option to _ennaf_, to enable lossy quantization of FASTQ qualities.
 - Improved Makefile portability.
 - Improved compatibility with clang.
-- Updated zstd to v1.5.1.
+- Updated zstd to v1.5.7.
 
 ## 1.3.0 - 2021-05-17
 - Added `--long` option to _ennaf_ for setting sequence window size.
