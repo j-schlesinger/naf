@@ -12,7 +12,7 @@
     in
     {
       packages = forAllSystems ({ pkgs }: {
-        default = pkgs.callPackage ./default.nix { };
+        default = pkgs.callPackage ./default.nix { inherit pkgs; };
       });
 
       devShells = forAllSystems ({ pkgs }: {
