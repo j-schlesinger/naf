@@ -1,25 +1,27 @@
-{
-  stdenv,
-  lib,
-  zstd,
-  pkg-config
+{ stdenv
+, lib
+, pkg-config
 }:
+let
+  zstdCheckFile = zstd/LICENSE;
+in
 
 stdenv.mkDerivation {
   pname = "naf";
   version = "1.3.0";
-  src = ./.;
-  nativeBuildInputs = [pkg-config];
-  buildInputs = [zstd];
+  src =
+    if builtins.pathExists zstdCheckFile
+    then ./.
+    else
+      builtins.throw ''
+        Submodule for zstd not found in the source tree.
+          Please run this flake using:
+          nix shell "github:KirillKryukov/naf?submodules=1"
+      '';
+  nativeBuildInputs = [ pkg-config ];
   makeFlags = [
     "prefix=$(out)"
   ];
-  postPatch = ''
-    sed -i '/zstd\/lib/d' Makefile
-    substituteInPlace **/Makefile \
-      --replace "../zstd/lib/libzstd.a" "-lzstd" \
-      --replace "-I../zstd/lib" ""
-  '';
   preBuild = ''
     # This provides the correct -I and -L flags for the Nix store versions
     export NIX_CFLAGS_COMPILE="$NIX_CFLAGS_COMPILE $(pkg-config --cflags libzstd)"
@@ -31,6 +33,9 @@ stdenv.mkDerivation {
     cp ennaf/ennaf $out/bin/
     cp unnaf/unnaf $out/bin/
     runHook postInstall
+  '';
+  checkPhase = ''
+    make test
   '';
   meta = with lib; {
     description = "Nucleotide Archive Format compression and decompression software";
